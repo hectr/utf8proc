@@ -76,7 +76,25 @@
 /** @} */
 
 #include <stdlib.h>
-#include <sys/types.h>
+#include <limits.h>
+#if defined(_POSIX_VERSION) || defined(__unix__) ||  defined(__unix) || (defined(__APPLE__) && defined(__MACH__))
+#  include <sys/types.h>
+#else
+#  include <stddef.h>
+#  include <stdint.h>
+#  if SIZE_MAX == USHRT_MAX
+typedef short ssize_t;
+#  elif SIZE_MAX == UINT_MAX
+typedef int ssize_t;
+#  elif SIZE_MAX == ULONG_MAX
+typedef long ssize_t;
+#  elif SIZE_MAX == ULLONG_MAX
+typedef long long ssize_t;
+#  else
+#    error ssize_t cannot be inferred from SIZE_MAX
+#  endif
+#endif
+
 #ifdef _MSC_VER
 typedef signed char utf8proc_int8_t;
 typedef unsigned char utf8proc_uint8_t;
@@ -110,7 +128,6 @@ typedef size_t utf8proc_size_t;
 typedef ssize_t utf8proc_ssize_t;
 typedef bool utf8proc_bool;
 #endif
-#include <limits.h>
 
 #ifdef _WIN32
 #  ifdef UTF8PROC_EXPORTS
